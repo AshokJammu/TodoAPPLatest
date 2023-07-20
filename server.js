@@ -1,10 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const TaskSchema = require('./model');
-
+const cors = require('cors');
 
 const app = express();
-app.use(express.json());
 mongoose.connect('mongodb+srv://ashok:ashok@cluster0.0pygyzv.mongodb.net/?retryWrites=true&w=majority').then(
     ()=>{
         console.log("DB connected");
@@ -13,9 +12,15 @@ mongoose.connect('mongodb+srv://ashok:ashok@cluster0.0pygyzv.mongodb.net/?retryW
    err => console.log(err)
 )
 
-// app.get('/',(req,res)=>{
-//     res.send("HELLO WORLD!");
-// })
+
+app.use(express.json());
+app.use(cors({
+    origin:"*"
+}))
+
+app.get('/',(req,res)=>{
+    res.send("HELLO WORLD!");
+})
 
 app.post('/addtask', async(req,res)=>{
     const {todo} = req.body;
@@ -26,10 +31,27 @@ app.post('/addtask', async(req,res)=>{
         })
         console.log("todo",todo);
         await newData.save();
-        return res.json(await TaskSchema.find());
+        return res.json(await TaskSchema.find())
     }
     catch(err){
         console.log(err);
+    }
+})
+
+app.get('/gettask',async (req,res)=>{
+    try{
+        return res.json(await TaskSchema.find())
+    }catch(err){
+        console.log(err,"error in get task")
+    }
+})
+
+app.delete('/delete/:id',async(req,res)=>{
+    try{
+        await TaskSchema.findByIdAndDelete(req.params.id);
+        return res.json(await TaskSchema.find())
+    }catch(err){
+        console.log(err,"delete by ID")
     }
 })
 
