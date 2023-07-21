@@ -1,7 +1,7 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const TaskSchema = require('./model');
-const cors = require('cors');
+const express = require('express')
+const mongoose = require('mongoose')
+const cors = require('cors')
+const TaskSchema = require('./model')
 
 const app = express();
 mongoose.connect('mongodb+srv://ashok:ashok@cluster0.0pygyzv.mongodb.net/?retryWrites=true&w=majority').then(
@@ -9,52 +9,48 @@ mongoose.connect('mongodb+srv://ashok:ashok@cluster0.0pygyzv.mongodb.net/?retryW
         console.log("DB connected");
     }
 ).catch(
-   err => console.log(err)
+    err => console.log(err,"DB connection error")
 )
-
 
 app.use(express.json());
 app.use(cors({
-    origin:"*"
+    origin:'*'
 }))
 
 app.get('/',(req,res)=>{
-    res.send("HELLO WORLD!");
+    res.send("Hello World!");
 })
 
-app.post('/addtask', async(req,res)=>{
+app.post('/addtask',async(req,res)=>{
     const {todo} = req.body;
-    console.log(req.body);
     try{
         const newData = new TaskSchema({
-            todo : todo
+            todo:todo
         })
-        console.log("todo",todo);
         await newData.save();
         return res.json(await TaskSchema.find())
-    }
-    catch(err){
-        console.log(err);
+    }catch(err){
+        console.log(err,"error in addtask")
     }
 })
 
-app.get('/gettask',async (req,res)=>{
+app.get('/gettask',async(req,res)=>{
     try{
         return res.json(await TaskSchema.find())
     }catch(err){
-        console.log(err,"error in get task")
+        console.log(err,"Error in gettask")
     }
 })
 
-app.delete('/delete/:id',async(req,res)=>{
+app.delete(`/delete/:id`,async(req,res)=>{
     try{
-        await TaskSchema.findByIdAndDelete(req.params.id);
+        await TaskSchema.findByIdAndDelete(req.params.id)
         return res.json(await TaskSchema.find())
     }catch(err){
-        console.log(err,"delete by ID")
+        console.log(err,"error in delete")
     }
 })
 
 app.listen(5000,()=>{
-    console.log("Server started ....")
+    console.log("Server started ....");
 })
